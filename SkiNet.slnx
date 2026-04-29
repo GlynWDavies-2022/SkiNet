@@ -1,1 +1,5 @@
-<Solution />
+<Solution>
+  <Project Path="SkiNet.API/SkiNet.API.csproj" Id="2dea9442-bef4-420e-a368-06353f31579b" />
+  <Project Path="SkiNet.Core/SkiNet.Core.csproj" Id="89d5c00c-0d6b-44ab-95c5-55121d47d0aa" />
+  <Project Path="SkiNet.Infrastructure/SkiNet.Infrastructure.csproj" Id="724ed060-8fc8-4e3e-b876-a94d3504ef7b" />
+</Solution>
