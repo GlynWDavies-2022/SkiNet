@@ -57,7 +57,13 @@ namespace SkiNet.API.Controllers
                 return NotFound($"Product with id {id} could not be found!");
             }
 
-            _context.Entry(product).State = EntityState.Modified;
+            productToUpdate.Name = product.Name;
+            productToUpdate.Description = product.Description;
+            productToUpdate.Price = product.Price;
+            productToUpdate.PictureUrl = product.PictureUrl;
+            productToUpdate.Type = product.Type;
+            productToUpdate.Brand = product.Brand;
+            productToUpdate.QuantityInStock = product.QuantityInStock;
 
             await _context.SaveChangesAsync();
 
