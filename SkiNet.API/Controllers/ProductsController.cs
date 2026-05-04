@@ -39,12 +39,52 @@ namespace SkiNet.API.Controllers
         {
             var product = await _context.Products.FindAsync(id);
 
-            if (product == null)
+            if (!ProductExists(id) || product == null)
             {
                 return NotFound($"Product with id {id} could not be found!");
             }
 
             return Ok(product);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateProduct(int id, Product product)
+        {
+            var productToUpdate = await _context.Products.FindAsync(id);
+
+            if (!ProductExists(id) || productToUpdate is null)
+            {
+                return NotFound($"Product with id {id} could not be found!");
+            }
+
+            _context.Entry(product).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteProduct(int id)
+        {
+            var productToDelete = await _context.Products.FindAsync(id);
+
+            if (!ProductExists(id) || productToDelete is null)
+            {
+                return NotFound($"Product with id {id} could not be found!");
+            }
+
+            _context.Products.Remove(productToDelete);
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        private bool ProductExists(int id)
+        {
+            return _context.Products.Any(x => x.Id == id);
         }
     }
 }
