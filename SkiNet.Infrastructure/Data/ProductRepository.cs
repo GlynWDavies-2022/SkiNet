@@ -1,42 +1,44 @@
-﻿using SkiNet.Core.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using SkiNet.Core.Entities;
 using SkiNet.Core.Interfaces;
+using System.Runtime.CompilerServices;
 
 namespace SkiNet.Infrastructure.Data;
 
-public class ProductRepository : IProductRepository
+public class ProductRepository(SkiNetContext context) : IProductRepository
 {
+    private readonly SkiNetContext _context = context;
+
     public void AddProduct(Product product)
     {
-        throw new NotImplementedException();
+        _context.Products.Add(product);
+    }
+
+    public async Task<Product?> GetProductByIdAsync(int id)
+    {
+        return await _context.Products.FindAsync(id);
+    }
+
+    public async Task<IReadOnlyList<Product>> GetProductsAsync()
+    {
+        return await _context.Products.ToListAsync();
+    }
+
+    public async Task UpdateProduct(Product product)
+    {
+        _context.Entry(product).State = EntityState.Modified;
     }
 
     public void DeleteProduct(Product product)
     {
-        throw new NotImplementedException();
+        _context.Products.Remove(product);
     }
-
-    public Task<Product?> GetProductByIdAsync(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IReadOnlyList<Product>> GetProductsAsync()
-    {
-        throw new NotImplementedException();
-    }
-
     public bool ProductExists(int id)
     {
-        throw new NotImplementedException();
+        return _context.Products.Any(p => p.Id == id);
     }
-
-    public Task<bool> SaveChangesAsync()
+    public async Task<bool> SaveChangesAsync()
     {
-        throw new NotImplementedException();
-    }
-
-    public void UpdateProduct(Product product)
-    {
-        throw new NotImplementedException();
+        return await _context.SaveChangesAsync() > 0;
     }
 }

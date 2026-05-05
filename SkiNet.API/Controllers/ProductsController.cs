@@ -1,35 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SkiNet.Core.Entities;
-using SkiNet.Infrastructure.Data;
+using SkiNet.Core.Interfaces;
 
 namespace SkiNet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController(IProductRepository repository) : ControllerBase
     {
-        private readonly SkiNetContext _context;
-
-        public ProductsController(SkiNetContext context)
-        {
-            _context = context;
-        }
+        private readonly IProductRepository _repository = repository;
 
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-            _context.Products.Add(product);
+            _repository.AddProduct(product);
 
-            await _context.SaveChangesAsync();
-
-            return product;
+            return Created();
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts()
         {
-            var products = await _context.Products.ToListAsync();
+            var products = await _repository.GetProductsAsync();
 
             return Ok(products);
         }
@@ -37,12 +29,7 @@ namespace SkiNet.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductBy(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-
-            if (!ProductExists(id) || product == null)
-            {
-                return NotFound($"Product with id {id} could not be found!");
-            }
+            var product = await _repository.GetProductByIdAsync(id);
 
             return Ok(product);
         }
