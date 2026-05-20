@@ -13,7 +13,13 @@ namespace SkiNet.API.Controllers
         {
             repository.AddProduct(product);
 
-            return Created();
+            if (await repository.SaveChangesAsync())
+            {
+                // return CreatedAtAction("GetProductById", new { id  = product.Id }, product);
+                return Created();
+            }
+
+            return BadRequest("Problem creating product.");
         }
 
         [HttpGet]
@@ -47,17 +53,20 @@ namespace SkiNet.API.Controllers
                 return NotFound($"Product with id {id} could not be found!");
             }
 
-            productToUpdate.Name = product.Name;
-            productToUpdate.Description = product.Description;
-            productToUpdate.Price = product.Price;
-            productToUpdate.PictureUrl = product.PictureUrl;
-            productToUpdate.Type = product.Type;
-            productToUpdate.Brand = product.Brand;
-            productToUpdate.QuantityInStock = product.QuantityInStock;
+            // productToUpdate.Name = product.Name;
+            // productToUpdate.Description = product.Description;
+            // productToUpdate.Price = product.Price;
+            // productToUpdate.PictureUrl = product.PictureUrl;
+            // productToUpdate.Type = product.Type;
+            // productToUpdate.Brand = product.Brand;
+            // productToUpdate.QuantityInStock = product.QuantityInStock;
 
-            await repository.SaveChangesAsync();
+            if(await repository.SaveChangesAsync())
+            {
+                return NoContent();
+            }
 
-            return NoContent();
+            return BadRequest("Problem updating product.");
 
         }
 
@@ -73,9 +82,12 @@ namespace SkiNet.API.Controllers
 
             repository.DeleteProduct(productToDelete);
 
-            await repository.SaveChangesAsync();
+            if(await repository.SaveChangesAsync())
+            {
+                return NoContent();
+            }
 
-            return Ok();
+            return BadRequest("Problem deleting product.");
         }
 
         private bool ProductExists(int id)

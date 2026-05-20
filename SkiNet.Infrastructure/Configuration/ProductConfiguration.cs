@@ -14,7 +14,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Description)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(512);
 
         builder.Property(p => p.Price).HasColumnType("decimal(18,2)");
 
