@@ -37,7 +37,7 @@ namespace SkiNet.API.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
         {
-            var productToUpdate = await _context.Products.FindAsync(id);
+            var productToUpdate = await _repository.GetProductByIdAsync(id);
 
             if (!ProductExists(id) || productToUpdate is null)
             {
@@ -52,7 +52,7 @@ namespace SkiNet.API.Controllers
             productToUpdate.Brand = product.Brand;
             productToUpdate.QuantityInStock = product.QuantityInStock;
 
-            await _context.SaveChangesAsync();
+            await _repository.SaveChangesAsync();
 
             return NoContent();
 
@@ -61,23 +61,23 @@ namespace SkiNet.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduct(int id)
         {
-            var productToDelete = await _context.Products.FindAsync(id);
+            var productToDelete = await _repository.GetProductByIdAsync(id);
 
             if (!ProductExists(id) || productToDelete is null)
             {
                 return NotFound($"Product with id {id} could not be found!");
             }
 
-            _context.Products.Remove(productToDelete);
+            _repository.DeleteProduct(productToDelete);
 
-            await _context.SaveChangesAsync();
+            await _repository.SaveChangesAsync();
 
             return Ok();
         }
 
         private bool ProductExists(int id)
         {
-            return _context.Products.Any(x => x.Id == id);
+            return _repository.ProductExists(id);
         }
     }
 }
