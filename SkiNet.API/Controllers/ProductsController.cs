@@ -8,12 +8,10 @@ namespace SkiNet.API.Controllers
     [Route("api/[controller]")]
     public class ProductsController(IProductRepository repository) : ControllerBase
     {
-        private readonly IProductRepository _repository = repository;
-
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-            _repository.AddProduct(product);
+            repository.AddProduct(product);
 
             return Created();
         }
@@ -21,7 +19,7 @@ namespace SkiNet.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts()
         {
-            var products = await _repository.GetProductsAsync();
+            var products = await repository.GetProductsAsync();
 
             return Ok(products);
         }
@@ -29,7 +27,7 @@ namespace SkiNet.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductBy(int id)
         {
-            var product = await _repository.GetProductByIdAsync(id);
+            var product = await repository.GetProductByIdAsync(id);
 
             if (product is null) 
             {
@@ -42,7 +40,7 @@ namespace SkiNet.API.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
         {
-            var productToUpdate = await _repository.GetProductByIdAsync(id);
+            var productToUpdate = await repository.GetProductByIdAsync(id);
 
             if (!ProductExists(id) || productToUpdate is null)
             {
@@ -57,7 +55,7 @@ namespace SkiNet.API.Controllers
             productToUpdate.Brand = product.Brand;
             productToUpdate.QuantityInStock = product.QuantityInStock;
 
-            await _repository.SaveChangesAsync();
+            await repository.SaveChangesAsync();
 
             return NoContent();
 
@@ -66,23 +64,23 @@ namespace SkiNet.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduct(int id)
         {
-            var productToDelete = await _repository.GetProductByIdAsync(id);
+            var productToDelete = await repository.GetProductByIdAsync(id);
 
             if (!ProductExists(id) || productToDelete is null)
             {
                 return NotFound($"Product with id {id} could not be found!");
             }
 
-            _repository.DeleteProduct(productToDelete);
+            repository.DeleteProduct(productToDelete);
 
-            await _repository.SaveChangesAsync();
+            await repository.SaveChangesAsync();
 
             return Ok();
         }
 
         private bool ProductExists(int id)
         {
-            return _repository.ProductExists(id);
+            return repository.ProductExists(id);
         }
     }
 }
