@@ -31,6 +31,11 @@ namespace SkiNet.API.Controllers
         {
             var product = await _repository.GetProductByIdAsync(id);
 
+            if (product is null) 
+            {
+                return NotFound();
+            }
+
             return Ok(product);
         }
 
