@@ -23,12 +23,24 @@ namespace SkiNet.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts()
+        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, string? type, string? sort)
         {
-            var products = await repository.GetProductsAsync();
+            var products = await repository.GetProductsAsync(brand, type, sort);
 
             return Ok(products);
         }
+
+        // Alternative approach -----------------------------------------------------------------------
+
+        // [HttpGet]
+        // public async Task<ActionResult<IReadOnlyList<Product>>> GetProductsByBrandAsync(string brand)
+        // {
+        //    var products = await repository.GetProductsByBrandAsync(brand);
+
+        //    return Ok(products);
+        // }
+
+        // ---------------------------------------------------------------------------------------------
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductBy(int id)
@@ -93,6 +105,24 @@ namespace SkiNet.API.Controllers
         private bool ProductExists(int id)
         {
             return repository.ProductExists(id);
+        }
+
+        // Brands
+
+        [HttpGet("brands")]
+        public async Task<ActionResult<IReadOnlyList<string>>> GetBrands()
+        {
+           return Ok(await repository.GetBrandsAsync());
+
+            
+        }
+
+        // Types
+
+        [HttpGet("types")]
+        public async Task<ActionResult<IReadOnlyList<string>>> GetTypes()
+        {
+            return Ok(await repository.GetTypesAsync());
         }
     }
 }

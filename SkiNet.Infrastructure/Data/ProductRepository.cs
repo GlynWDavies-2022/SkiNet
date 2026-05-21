@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using SkiNet.Core.Entities;
 using SkiNet.Core.Interfaces;
 
@@ -17,10 +18,38 @@ public class ProductRepository(SkiNetContext context) : IProductRepository
         return await context.Products.FindAsync(id);
     }
 
-    public async Task<IReadOnlyList<Product>> GetProductsAsync()
+    public async Task<IReadOnlyList<Product>> GetProductsAsync(string? brand, string? type, string? sort)
     {
-        return await context.Products.ToListAsync();
+        var query = context.Products.AsQueryable();
+
+        if(!string.IsNullOrWhiteSpace(brand))
+        {
+            query = query.Where(p => p.Brand.Equals(brand));
+        }
+
+        if (!string.IsNullOrWhiteSpace(type))
+        {
+            query = query.Where(p => p.Type.Equals(type));
+        }
+
+        query = sort switch
+        {
+            "priceAsc" => query.OrderBy(p => p.Price),
+            "priceDesc" => query.OrderByDescending(p => p.Price),
+            _ => query
+        };
+
+        return await query.ToListAsync();
     }
+
+    // Alternative approach ---------------------------------------------------------------------
+
+    // public async Task<IReadOnlyList<Product>> GetProductsByBrandAsync(string brand)
+    // {
+    //    return await context.Products.Where<Product>(p => p.Brand.Equals(brand)).ToListAsync();
+    // }
+
+    // ------------------------------------------------------------------------------------------
 
     public async Task UpdateProduct(Product product)
     {
@@ -38,5 +67,27 @@ public class ProductRepository(SkiNetContext context) : IProductRepository
     public async Task<bool> SaveChangesAsync()
     {
         return await context.SaveChangesAsync() > 0;
+    }
+
+    // Brands
+
+    public async Task<IReadOnlyList<string>> GetBrandsAsync()
+    {
+        return await context
+            .Products
+            .Select(p => p.Brand)
+            .Distinct()
+            .ToListAsync();
+    }
+
+    // Types
+
+    public async Task<IReadOnlyList<string>> GetTypesAsync()
+    {
+        return await context
+            .Products
+            .Select(p => p.Type)
+            .Distinct()
+            .ToListAsync();
     }
 }
