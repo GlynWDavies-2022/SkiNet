@@ -6,16 +6,15 @@ namespace SkiNet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController(IProductRepository repository) : ControllerBase
+    public class ProductsController(IGenericRepository<Product> repository) : ControllerBase
     {
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-            repository.AddProduct(product);
+            repository.Add(product);
 
-            if (await repository.SaveChangesAsync())
+            if (await repository.SaveAllAsync())
             {
-                // return CreatedAtAction("GetProductById", new { id  = product.Id }, product);
                 return Created();
             }
 
@@ -25,7 +24,7 @@ namespace SkiNet.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, string? type, string? sort)
         {
-            var products = await repository.GetProductsAsync(brand, type, sort);
+            var products = await repository.ListAllAsync();
 
             return Ok(products);
         }
@@ -45,7 +44,7 @@ namespace SkiNet.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductBy(int id)
         {
-            var product = await repository.GetProductByIdAsync(id);
+            var product = await repository.GetByIdAsync(id);
 
             if (product is null) 
             {
@@ -58,7 +57,7 @@ namespace SkiNet.API.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
         {
-            var productToUpdate = await repository.GetProductByIdAsync(id);
+            var productToUpdate = await repository.GetByIdAsync(id);
 
             if (!ProductExists(id) || productToUpdate is null)
             {
@@ -73,7 +72,7 @@ namespace SkiNet.API.Controllers
             // productToUpdate.Brand = product.Brand;
             // productToUpdate.QuantityInStock = product.QuantityInStock;
 
-            if(await repository.SaveChangesAsync())
+            if(await repository.SaveAllAsync())
             {
                 return NoContent();
             }
@@ -85,16 +84,16 @@ namespace SkiNet.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduct(int id)
         {
-            var productToDelete = await repository.GetProductByIdAsync(id);
+            var productToDelete = await repository.GetByIdAsync(id);
 
             if (!ProductExists(id) || productToDelete is null)
             {
                 return NotFound($"Product with id {id} could not be found!");
             }
 
-            repository.DeleteProduct(productToDelete);
+            repository.Remove(productToDelete);
 
-            if(await repository.SaveChangesAsync())
+            if(await repository.SaveAllAsync())
             {
                 return NoContent();
             }
@@ -104,7 +103,7 @@ namespace SkiNet.API.Controllers
 
         private bool ProductExists(int id)
         {
-            return repository.ProductExists(id);
+            return repository.Exists(id);
         }
 
         // Brands
@@ -112,9 +111,9 @@ namespace SkiNet.API.Controllers
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetBrands()
         {
-           return Ok(await repository.GetBrandsAsync());
+           // Todo...Implement method with generic repository
 
-            
+           return Ok();
         }
 
         // Types
@@ -122,7 +121,9 @@ namespace SkiNet.API.Controllers
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetTypes()
         {
-            return Ok(await repository.GetTypesAsync());
+            // Todo...Implement method with generic repository
+
+            return Ok();
         }
     }
 }

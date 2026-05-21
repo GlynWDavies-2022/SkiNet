@@ -19,6 +19,8 @@ builder.Services.AddDbContext<SkiNetContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SkiNetDatabaseConnection"));
 });
 
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 // ------------------------------------------------------------------------------------------------
