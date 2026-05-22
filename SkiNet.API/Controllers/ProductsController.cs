@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkiNet.Core.Entities;
 using SkiNet.Core.Interfaces;
+using SkiNet.Core.Specifications;
 
 namespace SkiNet.API.Controllers
 {
@@ -24,22 +25,12 @@ namespace SkiNet.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, string? type, string? sort)
         {
-            var products = await repository.ListAllAsync();
+            var specification = new ProductSpecification(brand, type);
+
+            var products = await repository.ListAsync(specification);
 
             return Ok(products);
         }
-
-        // Alternative approach -----------------------------------------------------------------------
-
-        // [HttpGet]
-        // public async Task<ActionResult<IReadOnlyList<Product>>> GetProductsByBrandAsync(string brand)
-        // {
-        //    var products = await repository.GetProductsByBrandAsync(brand);
-
-        //    return Ok(products);
-        // }
-
-        // ---------------------------------------------------------------------------------------------
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductBy(int id)
